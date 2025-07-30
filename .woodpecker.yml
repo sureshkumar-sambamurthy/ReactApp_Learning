@@ -22,7 +22,6 @@ steps:
     environment:
       HOME: /Users/sureshkumarsambamurthy/Documents
     commands:
-      - echo "Home is: $HOME"
       - mkdir -p $HOME
       - npm config set cache $HOME/.npm
       - npm install lighthouse
