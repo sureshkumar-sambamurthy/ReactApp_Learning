@@ -1,6 +1,7 @@
 steps:
   build-and-deploy:
     image: docker
+    privileged: true
     when:
       event:
         - push
