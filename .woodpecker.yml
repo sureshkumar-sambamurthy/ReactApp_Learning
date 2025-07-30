@@ -23,5 +23,9 @@ steps:
       HOME: /tmp
     commands:
       - sleep 15  # 💤 allow app time to start
+      - whoami
+      - echo $HOME
+      - ls -ld $HOME
+      - touch $HOME/.netrc
       - npm install lighthouse
       - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
