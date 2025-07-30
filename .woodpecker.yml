@@ -20,6 +20,7 @@ steps:
     image: cypress/browsers:node18.12.0-chrome107
     user: node
     environment:
+     CHROME_PATH: /usr/bin/chromium-browser
      HOME: /home/node
     commands:
      - npm install lighthouse@11.7.0
