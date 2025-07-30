@@ -22,11 +22,9 @@ steps:
     environment:
       HOME: /Users/sureshkumarsambamurthy/Documents
     commands:
-      - apk add --no-cache curl
-      - echo "Waiting for app to start..."
-      - >
-        while ! curl -s http://host.docker.internal:3000 >/dev/null; do
-          sleep 1;
-        done
-      - npm install lighthouse
-      - npx lighthouse http://host.docker.internal:3000 --output html --output-path ./report.html
+     commands:
+     - echo "Home is: $HOME"
+     - mkdir -p $HOME
+     - npm config set cache $HOME/.npm
+     - npm install lighthouse
+     - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
