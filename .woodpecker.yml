@@ -23,8 +23,7 @@ steps:
       HOME: /Users/sureshkumarsambamurthy/Documents
     commands:
      commands:
-     - echo "Home is: $HOME"
-     - mkdir -p $HOME
-     - npm config set cache $HOME/.npm
-     - npm install lighthouse
-     - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
+      - mkdir -p $HOME
+      - npm config set cache $HOME/.npm
+      - npm install lighthouse
+      - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
