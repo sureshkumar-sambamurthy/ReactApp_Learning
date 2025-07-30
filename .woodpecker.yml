@@ -19,6 +19,8 @@ steps:
   - name: lighthouse-audit
     image: zenika/alpine-chrome:with-node
     user: root
+    environment:
+      HOME: /tmp
     commands:
       - sleep 15  # 💤 allow app time to start
       - npm install lighthouse
