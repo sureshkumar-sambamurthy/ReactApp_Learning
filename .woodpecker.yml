@@ -17,13 +17,10 @@ steps:
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
 
   - name: lighthouse-audit
-    image: zenika/alpine-chrome:with-node
-    user: root
+    image: cypress/browsers:node18.12.0-chrome107
+    user: node
     environment:
-     HOME: /tmp
+     HOME: /home/node
     commands:
-     - mkdir -p /tmp/.config /tmp/.npm
-     - chmod -R 777 /tmp
-     - npm config set cache /tmp/.npm
      - npm install lighthouse
-     - npx lighthouse http://host.docker.internal:3000 --output html --output-path ./report.html
+     - lighthouse http://localhost:3000 --output html --output-path ./report.html
