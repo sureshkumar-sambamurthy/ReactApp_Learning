@@ -1,0 +1,6 @@
+pipeline:
+  test-step:
+    image: node:18
+    commands:
+      - echo "Hello from Woodpecker!"
+      - node -v
