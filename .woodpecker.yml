@@ -1,23 +1,24 @@
 steps:
-  build-and-deploy:
-    image: node:18
+  - name: build-and-deploy
+    image: docker:dind
     privileged: true
-    when:
-      event:
-        - push
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker build -t $DOCKER_USERNAME/react-app:latest .
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-      - sleep 10  # ⏱️ give the server some time to start
+
+  - name: lighthouse-audit
+    image: node:18
+    commands:
+      - sleep 15  # 💤 allow app time to start
       - npm install lighthouse
       - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
