@@ -1,18 +1,19 @@
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
 steps:
   build-and-deploy:
     image: docker
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - name: dockersock
+        path: /var/run/docker.sock
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-    when:
-      event:
-        - push
-      branch:
-        - main
     commands:
       - set -ex
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
@@ -20,4 +21,3 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA
-      
