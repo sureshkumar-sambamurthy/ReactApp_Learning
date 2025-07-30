@@ -22,9 +22,8 @@ steps:
     environment:
       HOME: /tmp
     commands:
-      - echo "Using HOME=$HOME"
-      - mkdir -p $HOME
+      - chmod 777 /root || true
+      - export HOME=/tmp
       - npm config set cache $HOME/.npm
-      - git config --global --unset credential.helper || true
       - npm install lighthouse
       - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
