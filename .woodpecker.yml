@@ -2,6 +2,8 @@ steps:
   build-and-deploy:
     image: docker
     privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     when:
       event:
         - push
@@ -10,8 +12,6 @@ steps:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker build -t $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA .
