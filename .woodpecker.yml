@@ -25,5 +25,6 @@ steps:
       - echo "Using HOME=$HOME"
       - mkdir -p $HOME
       - npm config set cache $HOME/.npm
+      - git config --global --unset credential.helper || true
       - npm install lighthouse
       - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
