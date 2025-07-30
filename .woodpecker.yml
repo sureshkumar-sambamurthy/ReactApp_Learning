@@ -1,6 +1,6 @@
 steps:
   build-and-deploy:
-    image: docker
+    image: node:18
     privileged: true
     when:
       event:
@@ -18,5 +18,6 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-      - npm install -g lighthouse
-      - lighthouse http://localhost:3000 --output.html --output-path ./report.html
+      - sleep 10  # ⏱️ give the server some time to start
+      - npm install lighthouse
+      - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
