@@ -18,4 +18,3 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA
-      
