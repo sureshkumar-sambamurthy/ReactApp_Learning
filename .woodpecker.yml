@@ -20,12 +20,13 @@ steps:
     image: zenika/alpine-chrome:with-node
     user: root
     environment:
-      HOME: /tmp
+      HOME: /Users/sureshkumarsambamurthy/Documents
     commands:
-      - sleep 15  # 💤 allow app time to start
-      - whoami
-      - echo $HOME
-      - ls -ld $HOME
-      - touch $HOME/.netrc
+      - apk add --no-cache curl
+      - echo "Waiting for app to start..."
+      - >
+        while ! curl -s http://host.docker.internal:3000 >/dev/null; do
+          sleep 1;
+        done
       - npm install lighthouse
-      - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
+      - npx lighthouse http://host.docker.internal:3000 --output html --output-path ./report.html
