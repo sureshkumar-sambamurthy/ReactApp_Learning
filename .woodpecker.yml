@@ -23,4 +23,4 @@ steps:
      HOME: /home/node
     commands:
      - npm install lighthouse
-     - lighthouse http://localhost:3000 --output html --output-path ./report.html
+     - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
