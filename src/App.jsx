@@ -10,7 +10,7 @@ function App() {
     <>
     <div className="wrapper">
       <div className="center-wrapper">
-        <h1>Who pays the bills</h1>
+        <h1>Who pays the bill</h1>
         {context.stage ==1 ?
         <Stage1/>
       :
