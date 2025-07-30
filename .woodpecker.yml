@@ -20,10 +20,10 @@ steps:
     image: zenika/alpine-chrome:with-node
     user: root
     environment:
-      HOME: /tmp
+     HOME: /tmp
     commands:
-      - chmod 777 /root || true
-      - export HOME=/tmp
-      - npm config set cache $HOME/.npm
-      - npm install lighthouse
-      - npx lighthouse http://localhost:3000 --output html --output-path ./report.html
+     - mkdir -p /tmp/.config /tmp/.npm
+     - chmod -R 777 /tmp
+     - npm config set cache /tmp/.npm
+     - npm install lighthouse
+     - npx lighthouse http://host.docker.internal:3000 --output html --output-path ./report.html
