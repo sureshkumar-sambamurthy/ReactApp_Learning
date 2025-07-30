@@ -18,3 +18,5 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
+      - npm install -g lighthouse
+      - lighthouse http://localhost:3000 --output.html --output-path ./report.html
