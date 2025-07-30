@@ -20,7 +20,7 @@ steps:
     image: zenika/alpine-chrome:with-node
     user: root
     environment:
-      HOME: /Users/sureshkumarsambamurthy/Documents
+      HOME: /tmp
     commands:
       - mkdir -p $HOME
       - npm config set cache $HOME/.npm
