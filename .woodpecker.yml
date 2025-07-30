@@ -1,3 +1,5 @@
+# .woodpecker.yml
+
 volumes:
   - name: dockersock
     host:
@@ -6,14 +8,14 @@ volumes:
 steps:
   build-and-deploy:
     image: docker
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
     commands:
       - set -ex
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
