@@ -1,31 +1,17 @@
 pipeline:
-  docker-build:
+  build-and-deploy:
     image: docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOCKER_USERNAME:
-        from_secret: "DOCKER_USERNAME"
+        from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
-        from_secret: "DOCKER_PASSWORD"
+        from_secret: DOCKER_PASSWORD
     commands:
+      - set -ex
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker build -t $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA .
-      - docker push $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA
-
-  # Optional deployment step
-  deploy:
-    image: alpine
-    when:
-      branch: main
-    environment:
-      SSH_KEY:
-        from_secret: SSH_KEY
-    commands:
-      - apk add --no-cache openssh
-      - mkdir -p ~/.ssh
-      - echo "$SSH_KEY" > ~/.ssh/id_rsa
-      - chmod 600 ~/.ssh/id_rsa
-      - ssh -o StrictHostKeyChecking=no user@your-server "
-          docker pull $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA &&
-          docker stop react-app || true &&
-          docker rm react-app || true &&
-          docker run -d --name react-app -p 80:3000 $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA"
+      - docker stop react-app || true
+      - docker rm react-app || true
+      - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA
