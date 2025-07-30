@@ -17,7 +17,7 @@ steps:
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
 
   - name: lighthouse-audit
-    image: cypress/browsers:node20.10.0-chrome107
+    image: cypress/browsers:node18.20.3-chrome125-ff126-edge125
     user: root
     commands:
       - sleep 15  # 💤 allow app time to start
