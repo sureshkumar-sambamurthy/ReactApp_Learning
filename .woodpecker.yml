@@ -1,13 +1,16 @@
 steps:
   build-and-deploy:
     image: docker
+    when:
+      event:
+        - push
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
     volumes:
-       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - set -ex
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
