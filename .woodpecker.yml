@@ -22,6 +22,7 @@ steps:
     environment:
       HOME: /tmp
     commands:
+      - echo "Using HOME=$HOME"
       - mkdir -p $HOME
       - npm config set cache $HOME/.npm
       - npm install lighthouse
