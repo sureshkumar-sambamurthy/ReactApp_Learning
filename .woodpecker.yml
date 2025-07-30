@@ -1,17 +1,31 @@
 pipeline:
-  install:
-    image: node:18
+  docker-build:
+    image: docker
+    environment:
+      DOCKER_USERNAME:
+        from_secret: "DOCKER_USERNAME"
+      DOCKER_PASSWORD:
+        from_secret: "DOCKER_PASSWORD"
     commands:
-      - npm install
-  preview-dev:
-    image: node:20
+      - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      - docker build -t $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA .
+      - docker push $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA
+
+  # Optional deployment step
+  deploy:
+    image: alpine
+    when:
+      branch: main
+    environment:
+      SSH_KEY:
+        from_secret: SSH_KEY
     commands:
-      - npm install
-      - nohup npm run dev &
-      - sleep 10
-      - curl http://localhost:5173
-  build:
-    image: node:20
-    commands:
-      - npm run build
-      - echo "✅ Build Successful"
+      - apk add --no-cache openssh
+      - mkdir -p ~/.ssh
+      - echo "$SSH_KEY" > ~/.ssh/id_rsa
+      - chmod 600 ~/.ssh/id_rsa
+      - ssh -o StrictHostKeyChecking=no user@your-server "
+          docker pull $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA &&
+          docker stop react-app || true &&
+          docker rm react-app || true &&
+          docker run -d --name react-app -p 80:3000 $DOCKER_USERNAME/react-app:$CI_COMMIT_SHORT_SHA"
