@@ -1,6 +1,17 @@
 pipeline:
-  test-step:
+  install:
     image: node:18
     commands:
-      - echo "Hello from Woodpecker!"
-      - node -v
+      - npm install
+  preview-dev:
+    image: node:20
+    commands:
+      - npm install
+      - nohup npm run dev &
+      - sleep 10
+      - curl http://localhost:5173
+  build:
+    image: node:20
+    commands:
+      - npm run build
+      - echo "✅ Build Successful"
