@@ -15,15 +15,11 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-
   - name: lighthouse-audit
-    image: cypress/browsers:node18.12.0-chrome107
+    image: trion/chromium-lighthouse
     user: node
-    environment:
-      CHROME_PATH: "/Applications/Google\ Chrome.app/Contents/MacOS/Google Chrome"
-      HOME: /usr/local/bin/node
     commands:
-      lighthouse http://localhost:3000 \
-       --chrome-path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-       --output html \
-       --output-path ./report.html
+     lighthouse http://host.docker.internal:3000 \
+      --chrome-flags="--headless --no-sandbox" \
+      --output html \
+      --output-path ./report.html
