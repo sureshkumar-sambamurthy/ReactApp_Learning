@@ -20,10 +20,14 @@ steps:
     image: cypress/browsers:node18.12.0-chrome107
     user: node
     environment:
-      CHROME_PATH: /usr/bin/google-chrome
-      HOME: /home/node
+      CHROME_PATH: /Applications/Google\ Chrome.app/Contents/MacOS/Google Chrome"
+      HOME: /usr/local/bin/node
     commands:
       - apt-get update
       - apt-get install -y chromium
       - npm install lighthouse
-      - npx lighthouse http://localhost:3000 --chrome-path=/usr/bin/google-chrome --output html --output-path ./report.html
+      - npx lighthouse http://localhost:3000 \
+        --chrome-path=/usr/bin/google-chrome \
+        --output html \
+        --output-path ./report.html \
+        --chrome-flags="--no-sandbox"
