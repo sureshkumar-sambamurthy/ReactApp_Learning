@@ -23,11 +23,7 @@ steps:
       CHROME_PATH: "/Applications/Google\ Chrome.app/Contents/MacOS/Google Chrome"
       HOME: /usr/local/bin/node
     commands:
-      - apt-get update
-      - apt-get install -y chromium
-      - npm install lighthouse
-      - npx lighthouse http://localhost:3000 \
-        --chrome-path=/usr/bin/google-chrome \
-        --output html \
-        --output-path ./report.html \
-        --chrome-flags="--no-sandbox"
+      - lighthouse http://localhost:3000 \
+       --chrome-path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+       --output html \
+       --output-path ./report.html
