@@ -16,7 +16,7 @@ const Stage2=()=>{
             RESET GAME
          </div>
          <div className="action_button btn_2" onClick={()=>context.getLooser()}>
-            GET LOOSER
+            GET LOOSERS
          </div>
         </>
     )
