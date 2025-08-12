@@ -23,7 +23,7 @@ steps:
       CHROME_PATH: "/Applications/Google\ Chrome.app/Contents/MacOS/Google Chrome"
       HOME: /usr/local/bin/node
     commands:
-      - lighthouse http://localhost:3000 \
+      lighthouse http://localhost:3000 \
        --chrome-path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
        --output html \
        --output-path ./report.html
