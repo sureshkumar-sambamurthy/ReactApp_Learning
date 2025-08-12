@@ -20,7 +20,7 @@ steps:
     image: cypress/browsers:node18.12.0-chrome107
     user: node
     environment:
-      CHROME_PATH: /Applications/Google\ Chrome.app/Contents/MacOS/Google Chrome"
+      CHROME_PATH: "/Applications/Google\ Chrome.app/Contents/MacOS/Google Chrome"
       HOME: /usr/local/bin/node
     commands:
       - apt-get update
