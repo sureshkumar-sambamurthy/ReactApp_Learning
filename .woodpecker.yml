@@ -24,6 +24,6 @@ steps:
       HOME: /home/node
     commands:
       - apt-get update
-      - apt-get install -y chromium-browser
-      - npm install lighthouse@11.7.0
+      - apt-get install -y chromium
+      - npm install lighthouse
       - npx lighthouse http://localhost:3000 --chrome-path=/usr/bin/google-chrome --output html --output-path ./report.html
