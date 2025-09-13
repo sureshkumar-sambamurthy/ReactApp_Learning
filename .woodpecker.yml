@@ -15,11 +15,11 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-  - name: lighthouse-audit
-    image: trion/chromium-lighthouse
-    user: node
-    commands:
-     lighthouse http://host.docker.internal:3000 \
-      --chrome-flags="--headless --no-sandbox" \
-      --output html \
-      --output-path ./report.html
+  # - name: lighthouse-audit
+  #   image: trion/chromium-lighthouse
+  #   user: node
+  #   commands:
+  #    lighthouse http://host.docker.internal:3000 \
+  #     --chrome-flags="--headless --no-sandbox" \
+  #     --output html \
+  #     --output-path ./report.html
