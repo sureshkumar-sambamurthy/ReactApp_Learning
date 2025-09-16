@@ -1,8 +1,7 @@
 import {Button,Form,Alert} from 'react-bootstrap'
 import { MyContext } from '../contexteds';
 const Stage1=()=>{
-    const playerInput = useRef();
-    const context = useContext(MyContext);
+import { MyContext } from '../../context/index';    const context = useContext(MyContext);
     const [error,setError] = useState([false,'']);
     const handleSubmit=(e)=>{
         e.preventDefault();
