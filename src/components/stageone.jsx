@@ -1,4 +1,5 @@
-import MyContext from '../../context';import {Button,Form,Alert} from 'react-bootstrap'
+import {useRef,useContext,useState} from 'react';
+import {Button,Form,Alert} from 'react-bootstrap'
 import { MyContext } from '../contexteds';
 const Stage1=()=>{
     const playerInput = useRef();
