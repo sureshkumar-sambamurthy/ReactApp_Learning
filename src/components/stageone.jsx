@@ -1,5 +1,5 @@
 import {Button,Form,Alert} from 'react-bootstrap'
-import { MyContext } from '../contexteds';
+import { MyContext } from '../context';
 const Stage1=()=>{
     const playerInput = useRef();
     const context = useContext(MyContext);
@@ -10,7 +10,7 @@ const Stage1=()=>{
        let isValid = validateInput(player);
        if(isValid){
             setError([false,''])
-            context.addPlayer(player)
+const context = useContext(MyContext);
             playerInput.current.value='';
        }
     }
