@@ -1,4 +1,4 @@
-import {Button,Form,Alert} from 'react-bootstrap'
+import { MyContext } from '../contexts'; (change 'contexteds' to 'contexts')
 import { MyContext } from '../contexteds';
 const Stage1=()=>{
     const playerInput = useRef();
