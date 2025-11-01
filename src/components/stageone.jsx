@@ -1,8 +1,6 @@
 import React, { useContext, useRef, useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap"; 
 import { MyContext } from '../context';
-`const Stage1=()=>{`
-`import { MyContext } from '../context';`
 const Stage1=()=>{
     const playerInput = useRef();
     const context = useContext(MyContext);
