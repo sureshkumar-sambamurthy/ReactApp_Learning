@@ -1,33 +1,61 @@
 ---
-services:
-  - name: docker
-    image: docker:24-dind
-    privileged: true
-    environment:
-      DOCKER_TLS_CERTDIR: ""   # disables TLS so docker CLI can connect via /var/run/docker.sock
-
-steps:
-  - name: build-and-deploy
+pipeline:
+  build-and-deploy:
     image: docker:24
+    privileged: true
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+      - name: lhci-data
+        path: /home/lhci/reports/.lighthouseci
     commands:
-      - docker info
+      # Log in and build image
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
+      
+      # Run React app
       - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
+      
+      # Wait for app to be up
       - sleep 10
 
-  - name: lighthouse
+  lighthouse:
     image: patrickhulce/lhci-client
+    privileged: true
+    volumes:
+      - name: lhci-data
+        path: /home/lhci/reports/.lighthouseci
+      - name: app-root
+        path: /app
+    environment:
+      LHCI_HOME: /home/lhci/reports/.lighthouseci
     commands:
-      - lhci autorun --upload.target=temporary-public-storage --collect.url=http://localhost:3000
+      - lhci autorun --config=/app/.lighthouserc.json --upload.target=temporary-public-storage
+    when:
+      branch: main
+      event: push
 
-  - name: cleanup
+  cleanup:
     image: docker:24
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: lhci-data
+    host:
+      path: ./lhci-data
+  - name: app-root
+    host:
+      path: .
