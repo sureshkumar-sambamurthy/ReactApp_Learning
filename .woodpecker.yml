@@ -1,14 +1,10 @@
 ---
-services:
-  - name: docker
-    image: docker:24-dind
-    privileged: true
-    environment:
-      DOCKER_TLS_CERTDIR: ""
-
 steps:
   - name: build-and-deploy
     image: docker:24
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
