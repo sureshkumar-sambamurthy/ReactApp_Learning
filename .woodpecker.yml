@@ -13,18 +13,19 @@ steps:
     commands:
       - docker info
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-      - docker stop react-app || true      # stop previous container if exists
-      - docker rm react-app || true        # remove previous container
+      - docker stop react-app || true
+      - docker rm react-app || true
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
       - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
       - sleep 10
 
   - name: lighthouse
     image: patrickhulce/lhci-client
+    volumes:
+      - name: app-root
+        path: /app
     commands:
       - lhci autorun --config=/app/.lighthouserc.json
-    volumes:
-      - .:/app
 
   - name: cleanup
     image: docker:24
@@ -33,3 +34,8 @@ steps:
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
+
+volumes:
+  - name: app-root
+    host:
+      path: .
