@@ -11,11 +11,11 @@ steps:
         from_secret: DOCKER_PASSWORD
     commands:
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-      - docker build -t $DOCKER_USERNAME/react-app:latest .
+      - docker build -t "$DOCKER_USERNAME/react-app:latest" .
       - docker stop react-app || true
       - docker rm react-app || true
-      - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-      - sleep 10  # wait for app startup
+      - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
+      - sleep 10
 
   - name: lighthouse
     image: patrickhulce/lhci-client
