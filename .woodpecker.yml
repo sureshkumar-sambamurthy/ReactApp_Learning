@@ -1,39 +1,29 @@
 ---
 steps:
   - name: build-and-deploy
-    image: docker:dind
+    image: docker:24-dind
     privileged: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
     commands:
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
-      - docker stop react-app || true
-      - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
       - sleep 10
 
   - name: lighthouse
     image: patrickhulce/lhci-client
-    volumes:
-      - name: lhci-reports
-        path: /home/lhci/reports/.lighthouseci
     commands:
       - lhci autorun --upload.target=temporary-public-storage --collect.url=http://localhost:3000
-    when:
-      branch: main
-      event: push
 
   - name: cleanup
     image: docker:24
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
@@ -42,6 +32,3 @@ volumes:
   - name: dockersock
     host:
       path: /var/run/docker.sock
-  - name: lhci-reports
-    host:
-      path: ./lhci-data
