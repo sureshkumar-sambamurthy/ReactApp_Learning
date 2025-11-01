@@ -15,8 +15,7 @@ steps:
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
       - docker stop react-app || true
       - docker rm react-app || true
-      - docker run -d --rm --name react-app -p 3000:3000 \
-          "$DOCKER_USERNAME/react-app:latest"
+      - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
       - sleep 10
 
   - name: lighthouse
@@ -25,10 +24,7 @@ steps:
       - name: lhci-reports
         path: /home/lhci/reports/.lighthouseci
     commands:
-      - >
-        lhci autorun
-        --upload.target=temporary-public-storage
-        --collect.url=http://localhost:3000
+      - lhci autorun --upload.target=temporary-public-storage --collect.url=http://localhost:3000
     when:
       branch: main
       event: push
