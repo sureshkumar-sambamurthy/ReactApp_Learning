@@ -22,8 +22,7 @@ steps:
   - name: lighthouse
     image: patrickhulce/lhci-client
     volumes:
-      - name: app-root
-        path: /app
+      - app-root
     commands:
       - lhci autorun --config=/app/.lighthouserc.json
 
@@ -39,3 +38,4 @@ volumes:
   - name: app-root
     host:
       path: .
+    container_path: /app
