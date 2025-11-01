@@ -22,7 +22,7 @@ steps:
   - name: lighthouse
     image: patrickhulce/lhci-client
     volumes:
-      - ./:/app
+      - ${PWD}:/app
     commands:
       - lhci autorun --config=/app/.lighthouserc.json
 
