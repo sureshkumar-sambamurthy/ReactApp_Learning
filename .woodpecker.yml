@@ -1,17 +1,21 @@
 ---
-steps:
-  - name: build-and-deploy
+services:
+  - name: docker
     image: docker:24-dind
     privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""   # disables TLS so docker CLI can connect via /var/run/docker.sock
+
+steps:
+  - name: build-and-deploy
+    image: docker:24
     environment:
       DOCKER_USERNAME:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-    volumes:
-      - name: dockersock
-        path: /var/run/docker.sock
     commands:
+      - docker info
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
       - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
@@ -27,8 +31,3 @@ steps:
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
-
-volumes:
-  - name: dockersock
-    host:
-      path: /var/run/docker.sock
