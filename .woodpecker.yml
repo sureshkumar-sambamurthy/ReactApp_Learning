@@ -23,18 +23,13 @@ steps:
 
   - name: lighthouse
     image: patrickhulce/lhci-client
-    volumes:
-      - name: app-root
-        path: /app
     commands:
       - lhci autorun --config=/app/.lighthouserc.json
+    volumes:
+      - .:/app
 
   - name: cleanup
     image: docker:24
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
-volumes:
-  - name: app-root
-    host:
-      path: .
