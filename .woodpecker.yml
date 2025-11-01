@@ -13,6 +13,8 @@ steps:
     commands:
       - docker info
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      - docker stop react-app || true      # stop previous container if exists
+      - docker rm react-app || true        # remove previous container
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
       - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
       - sleep 10
@@ -26,7 +28,8 @@ steps:
 
   - name: cleanup
     image: docker:24
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
-      - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
