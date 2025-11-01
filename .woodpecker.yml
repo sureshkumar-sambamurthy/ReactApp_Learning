@@ -22,7 +22,8 @@ steps:
   - name: lighthouse
     image: patrickhulce/lhci-client
     volumes:
-      - ${WOODPECKER_WORKSPACE}:/app
+      - name: workspace
+        path: /app
     commands:
       - lhci autorun --config=/app/.lighthouserc.json
 
@@ -33,3 +34,8 @@ steps:
     commands:
       - docker stop react-app || true
       - docker rm react-app || true
+
+volumes:
+  - name: workspace
+    host:
+      path: ${WOODPECKER_WORKSPACE}  # dynamically points to the repo checkout
