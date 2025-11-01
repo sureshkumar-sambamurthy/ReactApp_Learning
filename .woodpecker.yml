@@ -15,33 +15,32 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-      # wait for the app to be up (you can poll or use a simple sleep)
-      - sleep 10
-    lighthouse:
-      image: patrickhulce/lhci-client # using official LHCI Docker image
-      # ensure the same volume so reports persist if needed
-      volumes:
+      - sleep 10  # wait for app startup
+
+  - name: lighthouse
+    image: patrickhulce/lhci-client
+    volumes:
       - name: lhci-reports
         path: /home/lhci/reports/.lighthouseci
-     commands:
+    commands:
       - lhci autorun --upload.target=temporary-public-storage --collect.url=http://localhost:3000
-     when:
+    when:
       branch: main
       event: push
 
-   cleanup:
-     image: docker:24
-     volumes:
+  - name: cleanup
+    image: docker:24
+    volumes:
       - name: dockersock
         path: /var/run/docker.sock
-     commands:
+    commands:
       - docker stop react-app || true
       - docker rm react-app || true
 
-   volumes:
-      - name: dockersock
-        host:
-          path: /var/run/docker.sock
-      - name: lhci-reports
-        host:
-          path: ./lhci-data
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+  - name: lhci-reports
+    host:
+      path: ./lhci-data
