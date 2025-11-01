@@ -15,11 +15,33 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
       - docker run -d --rm --name react-app -p 3000:3000 $DOCKER_USERNAME/react-app:latest
-  # - name: lighthouse-audit
-  #   image: trion/chromium-lighthouse
-  #   user: node
-  #   commands:
-  #    lighthouse http://host.docker.internal:3000 \
-  #     --chrome-flags="--headless --no-sandbox" \
-  #     --output html \
-  #     --output-path ./report.html
+      # wait for the app to be up (you can poll or use a simple sleep)
+      - sleep 10
+    lighthouse:
+      image: patrickhulce/lhci-client # using official LHCI Docker image
+      # ensure the same volume so reports persist if needed
+      volumes:
+      - name: lhci-reports
+        path: /home/lhci/reports/.lighthouseci
+     commands:
+      - lhci autorun --upload.target=temporary-public-storage --collect.url=http://localhost:3000
+     when:
+      branch: main
+      event: push
+
+   cleanup:
+     image: docker:24
+     volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+     commands:
+      - docker stop myapp-ci || true
+      - docker rm myapp-ci   || true
+
+   volumes:
+      - name: dockersock
+        host:
+          path: /var/run/docker.sock
+      - name: lhci-reports
+        host:
+          path: ./lhci-data
