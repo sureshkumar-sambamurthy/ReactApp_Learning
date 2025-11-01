@@ -35,8 +35,8 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
      commands:
-      - docker stop myapp-ci || true
-      - docker rm myapp-ci   || true
+      - docker stop react-app || true
+      - docker rm react-app || true
 
    volumes:
       - name: dockersock
