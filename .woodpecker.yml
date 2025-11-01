@@ -35,7 +35,7 @@ steps:
       - docker rm react-app || true
 
 volumes:
-  - name: app-root
+  app-root:
     host:
       path: .
     container_path: /app
