@@ -9,7 +9,6 @@ RUN npm run build
 FROM zenika/alpine-chrome:with-node
 
 WORKDIR /app
-USER root  # 👈 temporarily switch to root for installing global packages
 RUN npm install -g serve @lhci/cli
 
 # Copy built app and config
