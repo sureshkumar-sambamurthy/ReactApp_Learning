@@ -44,12 +44,6 @@
 
 
 ---
-services:
-  react-app:
-    image: react-app:latest
-    ports:
-      - "3001:3000"
-
 steps:
   - name: build-and-test
     image: docker:24
@@ -76,7 +70,7 @@ steps:
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
 
       # Run the container in detached mode
-      - docker run -d --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
+      - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
 
       # Wait for the app to be ready
       - sleep 10

@@ -1,9 +1,9 @@
 {
   "ci": {
     "collect": {
-      "url": ["http://your-app:3000"],
+      "url": ["http://your-app:3001"],
       "puppeteerLaunchOptions": {
-        "browserURL": "http://localhost:3000"
+        "browserURL": "http://localhost:3001"
       }
     },
     "assert": {
