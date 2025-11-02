@@ -22,28 +22,23 @@
 # # Use npx to run serve locally installed
 # CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
 
-# Base Node image
 FROM node:20-bullseye
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package.json and install dependencies
 COPY package*.json ./
 RUN npm ci
 
-# Install LHCI and Puppeteer globally
-RUN npm install -g @lhci/cli puppeteer
-
-# Copy the rest of your app
+# Copy the rest of the app
 COPY . .
 
-# Expose the port your React app runs on
+# Install LHCI + Puppeteer
+RUN npm install -g @lhci/cli puppeteer
+
+# Expose React app port
 EXPOSE 3000
 
-# Environment variable for Puppeteer to use headless Chrome
-ENV LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
-
-# Default command to run the React app
+# Start the React app (keep it running in foreground)
 CMD ["npm", "start"]
-
