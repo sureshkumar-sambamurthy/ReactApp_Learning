@@ -76,7 +76,8 @@ steps:
       - sleep 10
 
       # Run Lighthouse CI inside the container
-      - docker exec react-app lhci autorun --config=/app/.lighthouserc.json
+      # - docker exec react-app lhci autorun --config=/app/.lighthouserc.json
+      - lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
 
       # Stop and remove the container
       - docker stop react-app || true
