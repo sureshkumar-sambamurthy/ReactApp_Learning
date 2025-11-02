@@ -5,17 +5,12 @@ COPY . .
 RUN npm install
 RUN npm run build
 
-# Step 2: Serve + LHCI using browserless/chrome
 FROM browserless/chrome:latest
 
 WORKDIR /app
-
-# Copy built app and config
 COPY --from=builder /app/dist ./dist
 COPY .lighthouserc.json ./
 
-# Install global npm packages for serving & LHCI
-USER root
 RUN npm install -g serve @lhci/cli
 
 EXPOSE 3000
