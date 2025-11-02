@@ -114,6 +114,10 @@ steps:
       # Log in to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 
+      # Stop and remove any existing container named react-app
+      - docker stop react-app || true
+      - docker rm react-app || true
+
       # Build your custom React + LHCI Docker image
       - docker build -t "$DOCKER_USERNAME/react-app-lhci:latest" .
 
