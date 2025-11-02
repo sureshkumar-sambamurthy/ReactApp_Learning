@@ -3,7 +3,8 @@
     "collect": {
       "url": ["http://localhost:3000"],
       "settings": {
-        "chromeFlags": "--no-sandbox --disable-setuid-sandbox"
+        "chromePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "chromeFlags": "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
       }
     },
     "assert": {
