@@ -44,7 +44,7 @@
 ---
 steps:
   - name: build-and-test
-    image: node:20
+    image: lighthouseci/lhci:latest
     platform: linux/amd64
     privileged: true
     volumes:
