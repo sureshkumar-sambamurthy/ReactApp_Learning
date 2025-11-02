@@ -24,21 +24,23 @@
 
 FROM node:20-bullseye
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Install dependencies
 COPY package*.json ./
 RUN npm ci
 
-# Copy the rest of the app
+# Copy source code
 COPY . .
 
-# Install LHCI + Puppeteer
-RUN npm install -g @lhci/cli puppeteer
+# Build the React app
+RUN npm run build
 
-# Expose React app port
+# Install LHCI + Puppeteer + serve
+RUN npm install -g @lhci/cli puppeteer serve
+
+# Expose port for static server
 EXPOSE 3000
 
-# Start the React app (keep it running in foreground)
-CMD ["npm", "start"]
+# Start the static server
+CMD ["serve", "-s", "build", "-l", "3000"]

@@ -109,33 +109,20 @@ steps:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-      LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
-      # Log in to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 
-      # Stop and remove any existing container named react-app
       - docker stop react-app || true
       - docker rm react-app || true
 
-      # Build your custom React + LHCI Docker image
       - docker build -t "$DOCKER_USERNAME/react-app-lhci:latest" .
 
-      # Run the container in detached mode
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app-lhci:latest"
 
-      # Wait for the app to start
-      - sleep 20
+      - sleep 10
 
-      # Run LHCI inside the same container
-      #- docker exec react-app lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
+      # Run LHCI inside the container
       - docker exec react-app lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json
 
-      # Stop and remove the container
       - docker stop react-app || true
       - docker rm react-app || true
-
-    when:
-      event:
-        - push
-        - pull_request
