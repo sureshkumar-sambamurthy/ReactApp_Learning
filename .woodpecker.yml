@@ -56,34 +56,31 @@ steps:
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
     commands:
-      # Install Docker CLI
-      - apt-get update && apt-get install -y docker.io
+      # Install Docker CLI and Chromium
+      - apt-get update
+      - apt-get install -y docker.io chromium
 
-      # Verify Docker works
+      # Verify installs
       - docker info
+      - chromium --version || echo "Chromium not found"
 
-      # Log in to Docker
+      # Docker login & build
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-
-      # Stop/remove existing container if any
       - docker stop react-app || true
       - docker rm react-app || true
-
-      # Build your React app image
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
-
-      # Run the app container on port 3001 (avoid browserless conflict)
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
-
-      # Wait for app to start
       - sleep 10
 
-      # Install and run Lighthouse CI
+      # Install Lighthouse CI CLI
       - npm install -g @lhci/cli
-      - lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
 
-      # Cleanup containers
+      # Run LHCI pointing to the app
+      - LHCI_CHROME_PATH=$(which chromium) lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
+
+      # Cleanup
       - docker stop react-app || true
       - docker rm react-app || true
+
 
 
