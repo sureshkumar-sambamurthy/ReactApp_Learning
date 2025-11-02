@@ -99,7 +99,7 @@
 
 steps:
   - name: build-and-test
-    image: node:20-bullseye
+    image: docker:24-dind
     platform: linux/amd64
     privileged: true
     volumes:
@@ -111,45 +111,26 @@ steps:
         from_secret: DOCKER_PASSWORD
       LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
-      # Install Docker CLI (required for building & running containers)
-      - apt-get update && apt-get install -y docker.io
-
-      # Show Docker info
-      - docker info
-
       # Log in to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 
-      # Stop/remove any existing container
-      - docker stop react-app || true
-      - docker rm react-app || true
+      # Build your custom React + LHCI Docker image
+      - docker build -t "$DOCKER_USERNAME/react-app-lhci:latest" .
 
-      # Build React app Docker image
-      - docker build -t "$DOCKER_USERNAME/react-app:latest" .
-
-      # Run React app container
-      - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
+      # Run the container in detached mode
+      - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app-lhci:latest"
 
       # Wait for the app to start
       - sleep 15
 
-      # Install LHCI + Puppeteer inside Node container
-      - npm install -g @lhci/cli puppeteer
-      - export PATH=$PATH:/usr/local/bin
+      # Run LHCI inside the same container
+      - docker exec react-app lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
 
-      # Export Puppeteer Chromium path
-      - export LHCI_CHROME_PATH=$(node -p "require('puppeteer').executablePath()")
-
-      # Run Lighthouse CI against React app
-      - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" \
-        lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
-
-      # Clean up React app container
+      # Stop and remove the container
       - docker stop react-app || true
       - docker rm react-app || true
 
-
-
-
-
-
+    when:
+      event:
+        - push
+        - pull_request
