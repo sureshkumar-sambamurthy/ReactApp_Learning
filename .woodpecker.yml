@@ -134,7 +134,7 @@ steps:
       - sleep 15
 
       # Install LHCI + Puppeteer inside Node container
-      - npm install -g @lhci/cli puppeteer
+      - sudo npm install -g @lhci/cli puppeteer
 
       # Export Puppeteer Chromium path
       - export LHCI_CHROME_PATH=$(node -p "require('puppeteer').executablePath()")
