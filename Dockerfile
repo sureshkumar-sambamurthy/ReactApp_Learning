@@ -5,14 +5,19 @@ COPY . .
 RUN npm install
 RUN npm run build
 
+# Step 2: Use browserless Chrome
 FROM browserless/chrome:latest
 
 WORKDIR /app
+
+# Copy built React app and LHCI config
 COPY --from=builder /app/dist ./dist
 COPY .lighthouserc.json ./
 
-RUN npm install -g serve @lhci/cli
+# Install serve and LHCI locally instead of globally
+RUN npm install serve @lhci/cli
 
 EXPOSE 3000
 
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Use npx to run serve locally installed
+CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
