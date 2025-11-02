@@ -1,6 +1,51 @@
+# ---
+# steps:
+#   - name: build-and-deploy
+#     image: docker:24
+#     privileged: true
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     environment:
+#       DOCKER_USERNAME:
+#         from_secret: DOCKER_USERNAME
+#       DOCKER_PASSWORD:
+#         from_secret: DOCKER_PASSWORD
+#     commands:
+#       - docker info
+#       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+#       - docker stop react-app || true
+#       - docker rm react-app || true
+#       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
+#       - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
+#       - sleep 10
+
+#   - name: lighthouse
+#     image: patrickhulce/lhci-client
+#     volumes:
+#       - name: workspace
+#         path: /app
+#     commands:
+#       - lhci autorun --config=/app/.lighthouserc.json
+
+#   - name: cleanup
+#     image: docker:24
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     commands:
+#       - docker stop react-app || true
+#       - docker rm react-app || true
+
+# volumes:
+#   - name: workspace
+#     host:
+#       path: ${WOODPECKER_WORKSPACE}  # dynamically points to the repo checkout
+
+
+
+
 ---
 steps:
-  - name: build-and-deploy
+  - name: build-and-test
     image: docker:24
     privileged: true
     volumes:
@@ -11,31 +56,34 @@ steps:
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
     commands:
+      # Show Docker info
       - docker info
+
+      # Login to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+
+      # Stop/remove any existing container
       - docker stop react-app || true
       - docker rm react-app || true
+
+      # Build your React app Docker image
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
-      - docker run -d --rm --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
+
+      # Run the container in detached mode
+      - docker run -d --name react-app -p 3000:3000 "$DOCKER_USERNAME/react-app:latest"
+
+      # Wait for the app to be ready
       - sleep 10
 
-  - name: lighthouse
-    image: patrickhulce/lhci-client
-    volumes:
-      - name: workspace
-        path: /app
-    commands:
-      - lhci autorun --config=/app/.lighthouserc.json
+      # Install LHCI in the running container
+      - docker exec react-app npm install -g @lhci/cli
 
-  - name: cleanup
-    image: docker:24
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - docker stop react-app || true
-      - docker rm react-app || true
+      # Copy your .lighthouserc.json into the container
+      - docker cp .lighthouserc.json react-app:/app/.lighthouserc.json
 
-volumes:
-  - name: workspace
-    host:
-      path: ${WOODPECKER_WORKSPACE}  # dynamically points to the repo checkout
+      # Run Lighthouse CI inside the container
+      - docker exec react-app lhci autorun --config=/app/.lighthouserc.json
+
+      # Stop and remove the container
+      - docker stop react-app
+      - docker rm react-app
