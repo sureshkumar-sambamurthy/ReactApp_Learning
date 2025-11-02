@@ -5,27 +5,20 @@ COPY . .
 RUN npm install
 RUN npm run build
 
-# Step 2: Serve + run LHCI (Chrome already included)
+# Step 2: Use Chrome + Node image
 FROM zenika/alpine-chrome:with-node
-
 WORKDIR /app
-RUN mkdir -p /app
-# Copy built assets
+
+# Copy built app and config
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package.json ./  # if needed for npm
 COPY .lighthouserc.json ./
 
-# Fix permissions so non-root user can access files
-# RUN chown -R chrome:chrome /app
+# Ensure permissions for root
+RUN chmod -R 777 /app
 
-# Switch to non-root user
-# USER chrome
-
-# Install LHCI and serve locally in /app/node_modules
-RUN npm install serve @lhci/cli
-
-# Add local node_modules to PATH
-ENV PATH=/app/node_modules/.bin:$PATH
+# Install serve and LHCI globally
+RUN npm install -g serve @lhci/cli
 
 EXPOSE 3000
 CMD ["serve", "-s", "dist", "-l", "3000"]
