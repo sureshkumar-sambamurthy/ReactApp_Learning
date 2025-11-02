@@ -129,7 +129,7 @@ steps:
 
       # Run LHCI inside the same container
       #- docker exec react-app lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
-      - lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
+      - docker exec react-app lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json
 
       # Stop and remove the container
       - docker stop react-app || true
