@@ -44,7 +44,7 @@
 ---
 steps:
   - name: build-and-test
-    image: patrickhulce/lhci-client:latest
+    image: docker:24-dind
     platform: linux/amd64
     privileged: true
     volumes:
