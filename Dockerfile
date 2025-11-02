@@ -22,25 +22,32 @@
 # # Use npx to run serve locally installed
 # CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
 
+# Use Node 20
 FROM node:20-bullseye
 
+# Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Copy package.json and package-lock.json
 COPY package*.json ./
+
+# Install app dependencies
 RUN npm ci
 
-# Copy source code
+# Copy the app source code
 COPY . .
 
-# Build the React app
-RUN npm run build
+# Install LHCI + Puppeteer globally
+RUN npm install -g @lhci/cli puppeteer
 
-# Install LHCI + Puppeteer + serve
-RUN npm install -g @lhci/cli puppeteer serve
-
-# Expose port for static server
+# Expose the React app port
 EXPOSE 3000
 
-# Start the static server
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Add wrapper script to run LHCI with Puppeteer Chromium path
+RUN echo '#!/bin/sh\n\
+export LHCI_CHROME_PATH=$(node -p "require(\"puppeteer\").executablePath()")\n\
+lhci "$@"' > /usr/local/bin/run-lhci && chmod +x /usr/local/bin/run-lhci
+
+# Default command: start React app
+CMD ["npm", "start"]
+

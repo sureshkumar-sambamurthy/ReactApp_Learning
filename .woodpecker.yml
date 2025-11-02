@@ -109,20 +109,33 @@ steps:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
+      LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
+      # Log in to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 
+      # Remove old container if exists
       - docker stop react-app || true
       - docker rm react-app || true
 
+      # Build app + LHCI image
       - docker build -t "$DOCKER_USERNAME/react-app-lhci:latest" .
 
+      # Run container in detached mode
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app-lhci:latest"
 
-      - sleep 10
+      # Wait for React app to start
+      - sleep 20
 
-      # Run LHCI inside the container
-      - docker exec react-app sh -c "export LHCI_CHROME_PATH=$(node -p 'require(\"puppeteer\").executablePath()') && lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json"
+      # Run LHCI inside same container (no docker exec needed)
+      - docker exec react-app run-lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json
 
-      - docker stop react-app || true
-      - docker rm react-app || true
+      # Stop container after LHCI run
+      - docker stop react-app
+      - docker rm react-app
+
+    when:
+      event:
+        - push
+        - pull_request
+
