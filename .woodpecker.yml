@@ -46,7 +46,7 @@
 ---
 steps:
   - name: build-and-test
-    image: docker:24
+    image: node:20
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
