@@ -42,10 +42,64 @@
 
 
 ---
+# steps:
+#   - name: build-and-test
+#     image: docker:24-dind
+#     platform: linux/amd64
+#     privileged: true
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     environment:
+#       DOCKER_USERNAME:
+#         from_secret: DOCKER_USERNAME
+#       DOCKER_PASSWORD:
+#         from_secret: DOCKER_PASSWORD
+#       LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
+#     commands:
+#       # Install Docker CLI
+#       - sudo apt-get update && sudo apt-get install -y docker.io
+
+#       # Show Docker info
+#       - docker info
+
+#       # Log in to Docker registry
+#       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+
+#       # Stop and remove any existing container
+#       - docker stop react-app || true
+#       - docker rm react-app || true
+
+#       # Build your React app Docker image
+#       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
+
+#       # Run the container in detached mode (avoid browserless conflict)
+#       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
+
+#       # Wait for the app to start
+#       - sleep 10
+
+#       # Install Lighthouse CI + Puppeteer (for bundled Chromium)
+#       - npm install -g @lhci/cli
+#       - npm ci   # installs local puppeteer from package.json
+
+#       # Export Puppeteer’s Chromium path for LHCI
+#       - export LHCI_CHROME_PATH=$(node -e "console.log(require('./node_modules/puppeteer').executablePath())")
+
+#       # Run Lighthouse CI with Chromium
+#       - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
+
+#       # Stop and remove the app container
+#       - docker stop react-app || true
+#       - docker rm react-app || true
+
+#     when:
+#       event:
+#         - push
+#         - pull_request
+
 steps:
-  - name: build-and-test
+  - name: build-and-run
     image: docker:24-dind
-    platform: linux/amd64
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -54,48 +108,23 @@ steps:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-      LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
-      # Install Docker CLI
-      - sudo apt-get update && sudo apt-get install -y docker.io
-
-      # Show Docker info
-      - docker info
-
-      # Log in to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-
-      # Stop and remove any existing container
       - docker stop react-app || true
       - docker rm react-app || true
-
-      # Build your React app Docker image
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
-
-      # Run the container in detached mode (avoid browserless conflict)
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
-
-      # Wait for the app to start
       - sleep 10
 
-      # Install Lighthouse CI + Puppeteer (for bundled Chromium)
-      - npm install -g @lhci/cli
-      - npm ci   # installs local puppeteer from package.json
+  - name: run-lhci
+    image: node:20-bullseye
+    environment:
+      LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
+    commands:
+      - npm install -g @lhci/cli puppeteer
+      - export LHCI_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+      - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
 
-      # Export Puppeteer’s Chromium path for LHCI
-      - export LHCI_CHROME_PATH=$(node -e "console.log(require('./node_modules/puppeteer').executablePath())")
-
-      # Run Lighthouse CI with Chromium
-      - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
-
-      # Stop and remove the app container
-      - docker stop react-app || true
-      - docker rm react-app || true
-
-    when:
-      event:
-        - push
-        - pull_request
 
 
 
