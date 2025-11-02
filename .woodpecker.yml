@@ -46,7 +46,7 @@
 ---
 steps:
   - name: build-and-test
-    image: node:20-docker
+    image: node:20
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -56,31 +56,34 @@ steps:
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
     commands:
-      # Show Docker info
+      # Install Docker CLI
+      - apt-get update && apt-get install -y docker.io
+
+      # Verify Docker works
       - docker info
 
-      # Login to Docker registry
+      # Log in to Docker
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 
-      # Stop/remove any existing container
+      # Stop/remove existing container if any
       - docker stop react-app || true
       - docker rm react-app || true
 
-      # Build your Chrome-ready React app Docker image
+      # Build your React app image
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
 
-      # Run the container in detached mode
+      # Run the app container on port 3001 (avoid browserless conflict)
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
 
-      # Wait for the app to be ready
+      # Wait for app to start
       - sleep 10
 
-      # Run Lighthouse CI inside the container
-      # - docker exec react-app lhci autorun --config=/app/.lighthouserc.json
+      # Install and run Lighthouse CI
       - npm install -g @lhci/cli
       - lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
 
-      # Stop and remove the container
+      # Cleanup containers
       - docker stop react-app || true
       - docker rm react-app || true
+
 
