@@ -78,10 +78,11 @@ steps:
       - sleep 10
 
       # Install Lighthouse CI + Puppeteer (for bundled Chromium)
-      - npm install -g @lhci/cli puppeteer --loglevel=error
+      - npm install -g @lhci/cli
+      - npm ci   # installs local puppeteer from package.json
 
       # Export Puppeteer’s Chromium path for LHCI
-      - export LHCI_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+      - export LHCI_CHROME_PATH=$(node -e "console.log(require('./node_modules/puppeteer').executablePath())")
 
       # Run Lighthouse CI with Chromium
       - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
