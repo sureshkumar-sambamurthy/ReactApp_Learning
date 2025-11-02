@@ -41,8 +41,6 @@
 #       path: ${WOODPECKER_WORKSPACE}  # dynamically points to the repo checkout
 
 
-
-
 ---
 steps:
   - name: build-and-test
@@ -55,20 +53,48 @@ steps:
         from_secret: DOCKER_USERNAME
       DOCKER_PASSWORD:
         from_secret: DOCKER_PASSWORD
-      LHCI_CHROME_FLAGS: "--no-sandbox"
+      LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
-      - apt-get update && apt-get install -y docker.io chromium
+      # Install Docker CLI
+      - apt-get update && apt-get install -y docker.io
+
+      # Show Docker info
       - docker info
+
+      # Log in to Docker registry
       - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+
+      # Stop and remove any existing container
       - docker stop react-app || true
       - docker rm react-app || true
+
+      # Build your React app Docker image
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
+
+      # Run the container in detached mode (avoid browserless conflict)
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app:latest"
+
+      # Wait for the app to start
       - sleep 10
-      - npm install -g @lhci/cli
-      - LHCI_CHROME_PATH=$(which chromium) lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
+
+      # Install Lighthouse CI + Puppeteer (for bundled Chromium)
+      - npm install -g @lhci/cli puppeteer
+
+      # Export Puppeteer’s Chromium path for LHCI
+      - export LHCI_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+
+      # Run Lighthouse CI with Chromium
+      - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
+
+      # Stop and remove the app container
       - docker stop react-app || true
       - docker rm react-app || true
+
+    when:
+      event:
+        - push
+        - pull_request
+
 
 
 
