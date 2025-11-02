@@ -78,7 +78,7 @@ steps:
       - sleep 10
 
       # Install Lighthouse CI + Puppeteer (for bundled Chromium)
-      - npm install -g @lhci/cli puppeteer
+      - npm install -g @lhci/cli puppeteer --loglevel=error
 
       # Export Puppeteer’s Chromium path for LHCI
       - export LHCI_CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
