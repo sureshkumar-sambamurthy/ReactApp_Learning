@@ -66,7 +66,7 @@ steps:
       - docker stop react-app || true
       - docker rm react-app || true
 
-      # Build your React app Docker image
+      # Build your Chrome-ready React app Docker image
       - docker build -t "$DOCKER_USERNAME/react-app:latest" .
 
       # Run the container in detached mode
@@ -75,15 +75,10 @@ steps:
       # Wait for the app to be ready
       - sleep 10
 
-      # Install LHCI in the running container
-      - docker exec react-app npm install -g @lhci/cli
-
-      # Copy your .lighthouserc.json into the container
-      - docker cp .lighthouserc.json react-app:/app/.lighthouserc.json
-
       # Run Lighthouse CI inside the container
       - docker exec react-app lhci autorun --config=/app/.lighthouserc.json
 
       # Stop and remove the container
-      - docker stop react-app
-      - docker rm react-app
+      - docker stop react-app || true
+      - docker rm react-app || true
+
