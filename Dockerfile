@@ -22,32 +22,32 @@
 # # Use npx to run serve locally installed
 # CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
 
-# Use Node 20
 FROM node:20-bullseye
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install app dependencies
 RUN npm ci
 
-# Copy the app source code
 COPY . .
 
 # Install LHCI + Puppeteer globally
 RUN npm install -g @lhci/cli puppeteer
 
-# Expose the React app port
+# Expose React port
 EXPOSE 3000
 
-# Add wrapper script to run LHCI with Puppeteer Chromium path
+# Add wrapper script to run React + LHCI sequentially
 RUN echo '#!/bin/sh\n\
+# Start React app in background\n\
+npm start &\n\
+APP_PID=$!\n\
+# Wait for app to be ready\n\
+sleep 20\n\
+# Set Puppeteer Chromium path and run LHCI\n\
 export LHCI_CHROME_PATH=$(node -p "require(\"puppeteer\").executablePath()")\n\
-lhci "$@"' > /usr/local/bin/run-lhci && chmod +x /usr/local/bin/run-lhci
+lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json\n\
+# Stop React app\n\
+kill $APP_PID' > /usr/local/bin/run-app-lhci && chmod +x /usr/local/bin/run-app-lhci
 
-# Default command: start React app
-CMD ["npm", "start"]
-
+CMD ["run-app-lhci"]
