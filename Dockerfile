@@ -10,19 +10,22 @@ FROM zenika/alpine-chrome:with-node
 
 WORKDIR /app
 
-# Install locally in /app/node_modules
-COPY package.json package-lock.json ./
-RUN npm install serve @lhci/cli
-
-# Copy built app and config
+# Copy built app and config as root
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./  # for npm install if needed
 COPY .lighthouserc.json ./
 
-# Use PATH to include local node_modules
-ENV PATH=/app/node_modules/.bin:$PATH
+# Fix permissions so non-root user can access files
+RUN chown -R chrome:chrome /app
 
-# Drop back to non-root user for runtime
+# Switch to non-root user
 USER chrome
+
+# Install LHCI and serve locally in /app/node_modules
+RUN npm install serve @lhci/cli
+
+# Add local node_modules to PATH
+ENV PATH=/app/node_modules/.bin:$PATH
 
 EXPOSE 3000
 CMD ["serve", "-s", "dist", "-l", "3000"]
