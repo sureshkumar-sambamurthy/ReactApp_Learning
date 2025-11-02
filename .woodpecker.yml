@@ -46,7 +46,7 @@
 ---
 steps:
   - name: build-and-test
-    image: node:20
+    image: node:20-docker
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -77,6 +77,7 @@ steps:
 
       # Run Lighthouse CI inside the container
       # - docker exec react-app lhci autorun --config=/app/.lighthouserc.json
+      - npm install -g @lhci/cli
       - lhci autorun --url=http://localhost:3001 --config=.lighthouserc.json
 
       # Stop and remove the container
