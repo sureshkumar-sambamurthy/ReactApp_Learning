@@ -16,10 +16,10 @@ COPY --from=builder /app/package.json ./
 COPY .lighthouserc.json ./
 
 # Fix permissions so non-root user can access files
-RUN chown -R chrome:chrome /app
+# RUN chown -R chrome:chrome /app
 
 # Switch to non-root user
-USER chrome
+# USER chrome
 
 # Install LHCI and serve locally in /app/node_modules
 RUN npm install serve @lhci/cli
