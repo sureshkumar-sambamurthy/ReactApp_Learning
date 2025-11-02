@@ -1,13 +1,23 @@
+# Step 1: Build React app
 FROM node:20 AS builder
 WORKDIR /app
 COPY . .
 RUN npm install
 RUN npm run build
 
+# Step 2: Serve + run LHCI (Chrome already included)
 FROM zenika/alpine-chrome:with-node
+
 WORKDIR /app
-COPY --from=builder /app/dist ./dist
+USER root  # 👈 temporarily switch to root for installing global packages
 RUN npm install -g serve @lhci/cli
+
+# Copy built app and config
+COPY --from=builder /app/dist ./dist
 COPY .lighthouserc.json ./
+
+# Drop back to non-root user for runtime
+USER chrome
+
 EXPOSE 3000
 CMD ["serve", "-s", "dist", "-l", "3000"]
