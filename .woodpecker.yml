@@ -121,7 +121,7 @@ steps:
     environment:
       LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
-      - npm install -g @lhci/cli puppeteer
+      - npm install -g @lhci/cli
       - export LHCI_CHROME_PATH=$(node -e "console.log(require('./node_modules/puppeteer').executablePath())")
       - LHCI_CHROME_FLAGS="--no-sandbox --headless --disable-gpu --disable-dev-shm-usage" lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
 
