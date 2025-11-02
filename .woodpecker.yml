@@ -122,7 +122,7 @@ steps:
       - sleep 10
 
       # Run LHCI inside the container
-      - docker exec react-app lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json
+      - docker exec react-app sh -c "export LHCI_CHROME_PATH=$(node -p 'require(\"puppeteer\").executablePath()') && lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json"
 
       - docker stop react-app || true
       - docker rm react-app || true

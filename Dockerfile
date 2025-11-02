@@ -39,6 +39,9 @@ RUN npm run build
 # Install LHCI + Puppeteer + serve
 RUN npm install -g @lhci/cli puppeteer serve
 
+# Set Puppeteer Chromium path for LHCI
+ENV LHCI_CHROME_PATH=$(node -p "require('puppeteer').executablePath()")
+
 # Expose port for static server
 EXPOSE 3000
 
