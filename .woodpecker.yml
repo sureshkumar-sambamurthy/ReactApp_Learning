@@ -44,6 +44,12 @@
 
 
 ---
+services:
+  react-app:
+    image: react-app:latest
+    ports:
+      - "3001:3000"
+
 steps:
   - name: build-and-test
     image: docker:24
