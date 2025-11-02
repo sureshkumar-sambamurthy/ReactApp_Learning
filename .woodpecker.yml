@@ -57,7 +57,7 @@ steps:
       LHCI_CHROME_FLAGS: "--no-sandbox --headless --disable-gpu --disable-dev-shm-usage"
     commands:
       # Install Docker CLI
-      - apt-get update && apt-get install -y docker.io
+      - sudo apt-get update && sudo apt-get install -y docker.io
 
       # Show Docker info
       - docker info
