@@ -9,10 +9,10 @@ RUN npm run build
 FROM zenika/alpine-chrome:with-node
 
 WORKDIR /app
-
-# Copy built app and config as root
+RUN mkdir -p /app
+# Copy built assets
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./  # for npm install if needed
+COPY --from=builder /app/package.json ./
 COPY .lighthouserc.json ./
 
 # Fix permissions so non-root user can access files
