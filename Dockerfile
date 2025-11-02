@@ -22,7 +22,8 @@
 # # Use npx to run serve locally installed
 # CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
 
-FROM node:20-bullseye
+# Use ARM64 node image for M1
+FROM --platform=linux/arm64 node:20-bullseye
 
 WORKDIR /app
 
@@ -34,20 +35,24 @@ COPY . .
 # Install LHCI + Puppeteer globally
 RUN npm install -g @lhci/cli puppeteer
 
-# Expose React port
+# Install necessary libraries for Puppeteer/Chrome
+RUN apt-get update && apt-get install -y \
+    ca-certificates fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
+    libatk1.0-0 libcups2 libdbus-1-3 libdrm2 libgbm1 libgtk-3-0 libnspr4 \
+    libnss3 libx11-xcb1 libxcomposite1 libxdamage1 libxrandr2 xdg-utils wget unzip \
+ && rm -rf /var/lib/apt/lists/*
+
+# Expose port
 EXPOSE 3000
 
-# Add wrapper script to run React + LHCI sequentially
+# Wrapper to start React app + LHCI
 RUN echo '#!/bin/sh\n\
-# Start React app in background\n\
 npm start &\n\
 APP_PID=$!\n\
-# Wait for app to be ready\n\
 sleep 20\n\
-# Set Puppeteer Chromium path and run LHCI\n\
 export LHCI_CHROME_PATH=$(node -p "require(\"puppeteer\").executablePath()")\n\
 lhci autorun --url=http://localhost:3000 --config=.lighthouserc.json\n\
-# Stop React app\n\
 kill $APP_PID' > /usr/local/bin/run-app-lhci && chmod +x /usr/local/bin/run-app-lhci
 
 CMD ["run-app-lhci"]
+
