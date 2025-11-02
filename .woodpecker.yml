@@ -125,10 +125,11 @@ steps:
       - docker run -d --name react-app -p 3001:3000 "$DOCKER_USERNAME/react-app-lhci:latest"
 
       # Wait for the app to start
-      - sleep 15
+      - sleep 20
 
       # Run LHCI inside the same container
-      - docker exec react-app lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
+      #- docker exec react-app lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
+      - lhci autorun --url=http://host.docker.internal:3001 --config=.lighthouserc.json
 
       # Stop and remove the container
       - docker stop react-app || true
